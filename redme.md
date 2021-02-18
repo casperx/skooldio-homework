@@ -3,6 +3,9 @@ Pokdeng Game written in JavaScript
 
 ---
 ### How to play
+```
+npm start
+```
 1. The initial step is putting your bets. After placing your bet, say 5 chips, the dealer will shuffle the deck, and deal two cards for you. The dealer gets the last pair.
 2. The values of the cards as shown
    * `Ace` is one point. 
