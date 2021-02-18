@@ -29,6 +29,9 @@ class Card {
         return this.#face
     }
   }
+  toString() {
+    return `${this.#suit}-${this.#face}`
+  }
 }
 
 class Deck {
@@ -72,16 +75,43 @@ async function main() {
         (ans) => res(ans)
       )
   )
+  const sumCardValue = (cards) => cards.reduce((a, i) => a + i.value, 0)
+  const printCards = (cards) => cards.join(', ')
+  let accumulateChip = 0
   for (;;) {
-    // you placing bets
-    // dealer reset deck and shuffle deck
-    // dealer pull 2 cards from deck for you
-    // dealer pull 2 cards from deck for himself
-    // compare values of card in yor hand against dealer
-    // 1. player > dealer, dealer pay you the amount you bet
-    // 2. player = dealer, you got nothing
-    // 3. player < dealer, you lose the bet
-    // you choose to continue or stop
+    // 1. you placing bets
+    const betAmount = parseInt(await read('Please put your bet\n'), 10)
+    // deduct bet amount from balance, if he has not enough chip to deduct, balance remains zero
+    accumulateChip -= betAmount
+    // 2. dealer reset deck and shuffle deck
+    const deck = new Deck()
+    deck.shuffle()
+    // 3. dealer pull 2 cards from deck for you
+    const yourCards = deck.draw(2)
+    // 4. dealer pull 2 cards from deck for himself
+    const dealerCards = deck.draw(2)
+    // show card to screen
+    const yourCardsValue = sumCardValue(yourCards)
+    const dealerCardsValue = sumCardValue(dealerCards)
+    console.log(`You got ${printCards(yourCards)} = ${yourCardsValue}`)
+    console.log(`The dealer got ${printCards(dealerCards)} = ${dealerCardsValue}`)
+    // 5. compare values of card in yor hand against dealer
+    // 5.1. player > dealer, dealer pay you the amount you bet
+    if (yourCardsValue > dealerCardsValue) {
+      accumulateChip += betAmount * 2
+      console.log(`You won!!, received ${betAmount} chips`)
+    }
+    // 5.2. player < dealer, you lose the bet
+    else if (yourCardsValue < dealerCardsValue) {
+      // dealer got the chips
+      console.log(`You lose!!, paid ${betAmount} chips`)
+    }
+    // 5.3. player = dealer, you got nothing
+    // 6. you choose to play again or stop
+    const playAgainAns = await read('Wanna play more (Yes/No)?')
+    if (playAgainAns === 'No') break;
   }
+  console.log(`You got total ${accumulateChip} chips`)
+  rl.close()
 }
 main()
