@@ -134,7 +134,7 @@ async function main() {
     }
 
     // 6. you choose to play again or stop
-    const playAgainAns = await readLine('Wanna play more (Yes/No)?')
+    const playAgainAns = await readLine('Wanna play more (Yes/No)?\n')
     if (playAgainAns.toLowerCase() === 'no') break;
   }
 
