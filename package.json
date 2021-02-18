@@ -1,0 +1,11 @@
+{
+  "name": "pok-deng",
+  "version": "1.0.0",
+  "description": "skooldio backend assignment",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit"
+  },
+  "author": "Ruangvit Sriumphaiviwat",
+  "license": "ISC"
+}
