@@ -4,7 +4,7 @@
   "description": "skooldio backend assignment",
   "main": "index.js",
   "scripts": {
-    "test": "exit"
+    "start": "node index.js"
   },
   "author": "Ruangvit Sriumphaiviwat",
   "license": "ISC"
