@@ -17,6 +17,7 @@ class Card {
     return this.#face
   }
   get value() {
+    // calculate value base on card face
     switch (this.#face) {
       case 10:
       case 'King':
@@ -37,6 +38,7 @@ class Card {
 class Deck {
   #cards = []
   constructor() {
+    // construct standard deck consist of 52 cards
     for (const suit of CardSuits) {
       for (const face of CardFaces) {
         const card = new Card(face, suit)
@@ -69,49 +71,81 @@ async function main() {
       output: process.stdout
     }
   )
-  const read = (msg) => new Promise(
+
+  // helper functions
+  const readLine = (msg) => new Promise(
     (res, rej) => 
       rl.question(msg, 
         (ans) => res(ans)
       )
   )
-  const sumCardValue = (cards) => cards.reduce((a, i) => a + i.value, 0)
+
+  const sumCardValue = 
+    (cards) => 
+      cards.reduce(
+        (a, i) => a + i.value
+      )
   const printCards = (cards) => cards.join(', ')
+
   let accumulateChip = 0
+
+  // game loop
   for (;;) {
     // 1. you placing bets
-    const betAmount = parseInt(await read('Please put your bet\n'), 10)
-    // deduct bet amount from balance, if he has not enough chip to deduct, balance remains zero
+    const betAmoutText = await readLine('Please put your bet\n')
+    const betAmount = parseInt(betAmoutText, 10)
+
+    // deduct bet amount from balance
     accumulateChip -= betAmount
+
     // 2. dealer reset deck and shuffle deck
     const deck = new Deck()
     deck.shuffle()
+    
     // 3. dealer pull 2 cards from deck for you
     const yourCards = deck.draw(2)
     // 4. dealer pull 2 cards from deck for himself
     const dealerCards = deck.draw(2)
+
     // show card to screen
+    console.log(`You got ${printCards(yourCards)}`)
+    console.log(`The dealer got ${printCards(dealerCards)}`)
+
+    // 5. compare values of card in yor hand against dealer
     const yourCardsValue = sumCardValue(yourCards)
     const dealerCardsValue = sumCardValue(dealerCards)
-    console.log(`You got ${printCards(yourCards)} = ${yourCardsValue}`)
-    console.log(`The dealer got ${printCards(dealerCards)} = ${dealerCardsValue}`)
-    // 5. compare values of card in yor hand against dealer
+
     // 5.1. player > dealer, dealer pay you the amount you bet
     if (yourCardsValue > dealerCardsValue) {
-      accumulateChip += betAmount * 2
+      accumulateChip += betAmount * 2 // multiply by 2 because dealer deduct you when you bet, 
+                                      // you get amout you bet returned too (observe from example)
       console.log(`You won!!, received ${betAmount} chips`)
     }
+
     // 5.2. player < dealer, you lose the bet
     else if (yourCardsValue < dealerCardsValue) {
-      // dealer got the chips
+      // dealer got the chips that you place bet
       console.log(`You lose!!, paid ${betAmount} chips`)
     }
+
     // 5.3. player = dealer, you got nothing
+    else {
+      console.log(`Tie, no one gain, no one lose`)
+    }
+
     // 6. you choose to play again or stop
-    const playAgainAns = await read('Wanna play more (Yes/No)?')
-    if (playAgainAns === 'No') break;
+    const playAgainAns = await readLine('Wanna play more (Yes/No)?')
+    if (playAgainAns.toLowerCase() === 'no') break;
   }
-  console.log(`You got total ${accumulateChip} chips`)
+
+  if (accumulateChip > 0)
+    console.log(`You got total ${accumulateChip} chips`)
+  else if (accumulateChip < 0)
+    console.log(`You owe dealer ${Math.abs(accumulateChip)} chips`)
+  else
+    console.log(`You got nothing`)
+
   rl.close()
 }
+
 main()
